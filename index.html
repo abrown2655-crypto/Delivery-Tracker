@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EEE8;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+    --text: #1A1916;
+    --text-muted: #6E6C66;
+    --text-hint: #A09E98;
+    --accent: #2A5C45;
+    --accent-bg: #E6F0EC;
+    --accent-text: #1A3D2E;
+    --warning: #7A4F00;
+    --warning-bg: #FFF3D6;
+    --info: #0D4D8A;
+    --info-bg: #E3EFF9;
+    --success: #1A5C2A;
+    --success-bg: #E3F4E8;
+    --neutral: #4A4845;
+    --neutral-bg: #EDEBE5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16150F;
+      --surface: #1E1D17;
+      --surface2: #26251E;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #F0EEE8;
+      --text-muted: #9E9C96;
+      --text-hint: #5C5A54;
+      --accent: #4A9E78;
+      --accent-bg: #0F2E1E;
+      --accent-text: #7EC4A0;
+      --warning: #F0B429;
+      --warning-bg: #2A1E00;
+      --info: #5BA3E0;
+      --info-bg: #071E38;
+      --success: #4CAF6E;
+      --success-bg: #0A2414;
+      --neutral: #9E9C96;
+      --neutral-bg: #26251E;
+    }
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+  }
+
+  .header-meta {
+    font-size: 12px;
+    color: var(--text-hint);
+  }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .page-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 300;
+    font-family: 'Fraunces', serif;
+    letter-spacing: -0.03em;
+  }
+
+  .stat-value.arriving { color: var(--warning); }
+  .stat-value.transit  { color: var(--info); }
+  .stat-value.pickup   { color: var(--neutral); }
+  .stat-value.delivered { color: var(--success); }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-left {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  select, input[type="text"] {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 7px 12px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  select:focus, input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="text"] {
+    min-width: 200px;
+    cursor: text;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 7px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: transparent;
+  }
+  .btn-primary:hover { opacity: 0.9; background: var(--accent); }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+
+  colgroup col:nth-child(1) { width: 28%; }
+  colgroup col:nth-child(2) { width: 13%; }
+  colgroup col:nth-child(3) { width: 16%; }
+  colgroup col:nth-child(4) { width: 13%; }
+  colgroup col:nth-child(5) { width: 20%; }
+  colgroup col:nth-child(6) { width: 10%; }
+
+  thead th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--text); }
+  thead th.sort-active { color: var(--text); }
+
+  .sort-arrow { margin-left: 4px; opacity: 0.4; font-style: normal; }
+  .sort-active .sort-arrow { opacity: 1; }
+
+  tbody tr { transition: background 0.1s; }
+  tbody tr:hover td { background: var(--surface2); }
+
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  .item-name {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .badge.arriving  { background: var(--warning-bg); color: var(--warning); }
+  .badge.arriving .badge-dot { background: var(--warning); }
+  .badge.transit   { background: var(--info-bg);    color: var(--info); }
+  .badge.transit .badge-dot { background: var(--info); }
+  .badge.pickup    { background: var(--neutral-bg); color: var(--neutral); }
+  .badge.pickup .badge-dot { background: var(--neutral); }
+  .badge.delivered { background: var(--success-bg); color: var(--success); }
+  .badge.delivered .badge-dot { background: var(--success); }
+
+  .tracking-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .delivery-date {
+    color: var(--text-muted);
+  }
+
+  .delivery-date.urgent {
+    color: var(--warning);
+    font-weight: 500;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+
+  .empty-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .add-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .add-modal-overlay.open { display: flex; }
+
+  .add-modal {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 480px;
+    margin: 1rem;
+  }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 1.25rem;
+  }
+
+  .last-updated {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin-top: 0.75rem;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 0 1rem; }
+    main { padding: 1rem 1rem 3rem; }
+    .page-title { font-size: 24px; }
+    colgroup col:nth-child(5) { width: 0; }
+    colgroup col:nth-child(6) { width: 0; }
+    thead th:nth-child(5), thead th:nth-child(6),
+    tbody td:nth-child(5), tbody td:nth-child(6) { display: none; }
+    colgroup col:nth-child(1) { width: 35%; }
+    colgroup col:nth-child(2) { width: 18%; }
+    colgroup col:nth-child(3) { width: 24%; }
+    colgroup col:nth-child(4) { width: 23%; }
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .table-wrap { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    Deliveries
+  </div>
+  <div class="header-meta" id="header-meta">Last scanned: —</div>
+</header>
+
+<main>
+  <h1 class="page-title">Your packages</h1>
+  <p class="page-subtitle" id="subtitle">Tracking <span id="total-count">7</span> shipments</p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Arriving today</div>
+      <div class="stat-value arriving" id="count-arriving">2</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">In transit</div>
+      <div class="stat-value transit" id="count-transit">4</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ready for pickup</div>
+      <div class="stat-value pickup" id="count-pickup">1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Delivered</div>
+      <div class="stat-value delivered" id="count-delivered">0</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <input type="text" id="search" placeholder="Search packages…" oninput="render()" style="flex:1; min-width:160px;">
+      <select id="filter-status" onchange="render()">
+        <option value="">All statuses</option>
+        <option value="arriving">Arriving today</option>
+        <option value="transit">In transit</option>
+        <option value="pickup">Ready for pickup</option>
+        <option value="delivered">Delivered</option>
+      </select>
+      <select id="filter-carrier" onchange="render()">
+        <option value="">All carriers</option>
+      </select>
+    </div>
+    <button class="btn" onclick="openModal()">+ Add package</button>
+    <a class="btn btn-primary" href="https://claude.ai/new?q=Please+scan+my+Gmail+inbox+for+shipping+and+delivery+emails+and+give+me+a+full+update+on+all+my+packages." target="_blank">↺ Scan Gmail</a>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <colgroup><col><col><col><col><col><col></colgroup>
+      <thead>
+        <tr>
+          <th onclick="sortBy('item')" id="th-item">Item <em class="sort-arrow" id="arr-item">↕</em></th>
+          <th onclick="sortBy('retailer')" id="th-retailer">Retailer <em class="sort-arrow" id="arr-retailer">↕</em></th>
+          <th onclick="sortBy('status')" id="th-status">Status <em class="sort-arrow" id="arr-status">↕</em></th>
+          <th onclick="sortBy('deliverySort')" id="th-deliverySort">Expected <em class="sort-arrow" id="arr-deliverySort">↑</em></th>
+          <th onclick="sortBy('tracking')" id="th-tracking">Tracking # <em class="sort-arrow" id="arr-tracking">↕</em></th>
+          <th onclick="sortBy('carrier')" id="th-carrier">Carrier <em class="sort-arrow" id="arr-carrier">↕</em></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="last-updated" id="last-updated">Last updated: —</div>
+</main>
+
+<div class="add-modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="add-modal">
+    <div class="modal-title">Add package</div>
+    <div class="form-group">
+      <label class="form-label">Item description</label>
+      <input class="form-input" id="f-item" type="text" placeholder="e.g. Blue sneakers">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Retailer</label>
+      <input class="form-input" id="f-retailer" type="text" placeholder="e.g. Amazon">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="f-status">
+        <option value="transit">In transit</option>
+        <option value="arriving">Arriving today</option>
+        <option value="pickup">Ready for pickup</option>
+        <option value="delivered">Delivered</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Expected delivery</label>
+      <input class="form-input" id="f-delivery" type="text" placeholder="e.g. May 16">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tracking number</label>
+      <input class="form-input" id="f-tracking" type="text" placeholder="Optional">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Carrier</label>
+      <input class="form-input" id="f-carrier" type="text" placeholder="e.g. UPS">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addPackage()">Add package</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STATUS_LABELS = {
+  arriving: 'Arriving today',
+  transit: 'In transit',
+  pickup: 'Ready for pickup',
+  delivered: 'Delivered',
+};
+
+const STORAGE_KEY = 'delivery_tracker_v1';
+
+const DEFAULT_PACKAGES = [
+  { id: 1, item: 'Collapsible Wagon Cart + 2 picnic table covers', retailer: 'Amazon', status: 'arriving', delivery: 'Today, 7–11 AM', tracking: '114-0911992-5809025', carrier: 'Amazon', deliverySort: 0 },
+  { id: 2, item: 'INIU Wireless Charger 15W', retailer: 'Amazon', status: 'arriving', delivery: 'Today, 4–8 AM', tracking: '114-6026872-0153003', carrier: 'Amazon', deliverySort: 0 },
+  { id: 3, item: 'Pura fragrances — White Bergamot & White Tea No. 1', retailer: 'Pura', status: 'transit', delivery: 'May 14', tracking: '—', carrier: '—', deliverySort: 1 },
+  { id: 4, item: 'Showpo order US201257', retailer: 'Showpo', status: 'transit', delivery: 'May 16–21', tracking: '—', carrier: '—', deliverySort: 2 },
+  { id: 5, item: 'Becka Maxi Dress — Yellow (US 2)', retailer: 'Peppermayo', status: 'transit', delivery: 'TBD', tracking: '9235990391615401512887', carrier: 'USPS', deliverySort: 3 },
+  { id: 6, item: 'Alivia Micro Mini Dress — Pink (US 2)', retailer: 'Peppermayo', status: 'transit', delivery: 'TBD', tracking: '420370279261290400212327444228', carrier: 'DHL', deliverySort: 3 },
+  { id: 7, item: 'Walgreens order #215109766037', retailer: 'Walgreens', status: 'pickup', delivery: 'Ready now', tracking: '—', carrier: 'In-store', deliverySort: 0 },
+];
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function save(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+
+let state = load() || { packages: DEFAULT_PACKAGES, nextId: 8, lastUpdated: new Date().toISOString() };
+
+let sortKey = 'deliverySort';
+let sortDir = 1;
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sort-active'));
+  document.getElementById('th-' + key)?.classList.add('sort-active');
+  const arrows = document.querySelectorAll('.sort-arrow');
+  arrows.forEach(a => { a.textContent = '↕'; });
+  const arr = document.getElementById('arr-' + key);
+  if (arr) arr.textContent = sortDir === 1 ? '↑' : '↓';
+  render();
+}
+
+function getFiltered() {
+  const q = (document.getElementById('search')?.value || '').toLowerCase();
+  const fs = document.getElementById('filter-status')?.value || '';
+  const fc = document.getElementById('filter-carrier')?.value || '';
+  return state.packages.filter(p => {
+    if (fs && p.status !== fs) return false;
+    if (fc && p.carrier !== fc) return false;
+    if (q && !p.item.toLowerCase().includes(q) && !p.retailer.toLowerCase().includes(q) && !p.tracking.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => {
+    let av = a[sortKey] ?? '';
+    let bv = b[sortKey] ?? '';
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+}
+
+function updateStats() {
+  const pkgs = state.packages;
+  document.getElementById('count-arriving').textContent = pkgs.filter(p => p.status === 'arriving').length;
+  document.getElementById('count-transit').textContent = pkgs.filter(p => p.status === 'transit').length;
+  document.getElementById('count-pickup').textContent = pkgs.filter(p => p.status === 'pickup').length;
+  document.getElementById('count-delivered').textContent = pkgs.filter(p => p.status === 'delivered').length;
+  document.getElementById('total-count').textContent = pkgs.length;
+  const d = new Date(state.lastUpdated);
+  const ds = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  document.getElementById('last-updated').textContent = 'Last updated: ' + ds;
+  document.getElementById('header-meta').textContent = 'Last scanned: ' + ds;
+}
+
+function populateCarrierFilter() {
+  const carriers = [...new Set(state.packages.map(p => p.carrier).filter(c => c && c !== '—'))].sort();
+  const sel = document.getElementById('filter-carrier');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All carriers</option>' + carriers.map(c => `<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
+}
+
+function render() {
+  updateStats();
+  populateCarrierFilter();
+  const data = getFiltered();
+  const tbody = document.getElementById('tbody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><div>No packages found</div></div></td></tr>`;
+    return;
+  }
+  const today = ['Today', 'today', 'Ready now', 'Arriving today'];
+  tbody.innerHTML = data.map(p => {
+    const isUrgent = today.some(t => (p.delivery || '').includes(t));
+    const trackingShort = (!p.tracking || p.tracking === '—') ? '—' : p.tracking.length > 20 ? p.tracking.slice(0, 18) + '…' : p.tracking;
+    return `<tr>
+      <td class="item-name" title="${escHtml(p.item)}">${escHtml(truncate(p.item, 45))}</td>
+      <td>${escHtml(p.retailer)}</td>
+      <td><span class="badge ${p.status}"><span class="badge-dot"></span>${STATUS_LABELS[p.status] || p.status}</span></td>
+      <td class="delivery-date${isUrgent ? ' urgent' : ''}">${escHtml(p.delivery || '—')}</td>
+      <td class="tracking-num" title="${escHtml(p.tracking)}">${escHtml(trackingShort)}</td>
+      <td>${escHtml(p.carrier || '—')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function truncate(s, n) {
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('f-item').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  ['f-item','f-retailer','f-delivery','f-tracking','f-carrier'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-status').value = 'transit';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function addPackage() {
+  const item = document.getElementById('f-item').value.trim();
+  if (!item) { document.getElementById('f-item').focus(); return; }
+  const pkg = {
+    id: state.nextId++,
+    item,
+    retailer: document.getElementById('f-retailer').value.trim() || '—',
+    status: document.getElementById('f-status').value,
+    delivery: document.getElementById('f-delivery').value.trim() || 'TBD',
+    tracking: document.getElementById('f-tracking').value.trim() || '—',
+    carrier: document.getElementById('f-carrier').value.trim() || '—',
+    deliverySort: 99,
+  };
+  state.packages.unshift(pkg);
+  state.lastUpdated = new Date().toISOString();
+  save(state);
+  closeModal();
+  render();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('th-deliverySort').classList.add('sort-active');
+document.getElementById('arr-deliverySort').textContent = '↑';
+
+render();
+</script>
+</body>
+</html>
