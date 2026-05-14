@@ -1,0 +1,9 @@
+{
+  "name": "delivery-tracker",
+  "version": "1.0.0",
+  "description": "Gmail-powered delivery tracker",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "googleapis": "^140.0.0"
+  }
+}
