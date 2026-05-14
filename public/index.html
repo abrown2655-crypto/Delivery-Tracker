@@ -56,22 +56,26 @@
   .btn:active { transform: scale(0.98); }
   .btn-primary { background: var(--accent); color: #fff; border-color: transparent; }
   .btn-primary:hover { opacity: 0.9; background: var(--accent); }
-  .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-  colgroup col:nth-child(1) { width: 28%; } colgroup col:nth-child(2) { width: 13%; }
-  colgroup col:nth-child(3) { width: 16%; } colgroup col:nth-child(4) { width: 13%; }
-  colgroup col:nth-child(5) { width: 20%; } colgroup col:nth-child(6) { width: 10%; }
+  colgroup col:nth-child(1) { width: 26%; }
+  colgroup col:nth-child(2) { width: 12%; }
+  colgroup col:nth-child(3) { width: 15%; }
+  colgroup col:nth-child(4) { width: 12%; }
+  colgroup col:nth-child(5) { width: 18%; }
+  colgroup col:nth-child(6) { width: 10%; }
+  colgroup col:nth-child(7) { width: 7%; }
   thead th { background: var(--surface2); padding: 10px 14px; font-size: 11px; font-weight: 500; color: var(--text-muted); text-align: left; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
-  thead th:hover { color: var(--text); }
-  thead th.sort-active { color: var(--text); }
+  thead th:hover { color: var(--text); } thead th.sort-active { color: var(--text); }
   .sort-arrow { margin-left: 4px; opacity: 0.4; font-style: normal; }
   .sort-active .sort-arrow { opacity: 1; }
   tbody tr { transition: background 0.1s; }
   tbody tr:hover td { background: var(--surface2); }
-  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   tbody tr:last-child td { border-bottom: none; }
-  .item-name { font-weight: 500; }
+  .item-link { font-weight: 500; color: var(--text); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-link:hover { color: var(--accent); text-decoration: underline; }
+  .item-no-link { font-weight: 500; }
   .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
   .badge-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
   .badge.arriving { background: var(--warning-bg); color: var(--warning); } .badge.arriving .badge-dot { background: var(--warning); }
@@ -79,10 +83,23 @@
   .badge.pickup { background: var(--neutral-bg); color: var(--neutral); } .badge.pickup .badge-dot { background: var(--neutral); }
   .badge.delivered { background: var(--success-bg); color: var(--success); } .badge.delivered .badge-dot { background: var(--success); }
   .badge.ordered { background: var(--surface2); color: var(--text-muted); } .badge.ordered .badge-dot { background: var(--text-muted); }
+  .status-select { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; border: none; border-radius: 20px; padding: 3px 6px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; width: 100%; }
+  .status-select.arriving { background: var(--warning-bg); color: var(--warning); }
+  .status-select.transit { background: var(--info-bg); color: var(--info); }
+  .status-select.pickup { background: var(--neutral-bg); color: var(--neutral); }
+  .status-select.delivered { background: var(--success-bg); color: var(--success); }
+  .status-select.ordered { background: var(--surface2); color: var(--text-muted); }
   .tracking-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .tracking-cell { display: flex; align-items: center; gap: 6px; }
+  .tracking-edit { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tracking-edit:hover { color: var(--accent); text-decoration: underline dashed; }
+  .tracking-input { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text); background: var(--surface); border: 1px solid var(--accent); border-radius: 4px; padding: 2px 6px; width: 100%; outline: none; }
+  .tracking-add { font-size: 11px; color: var(--text-hint); cursor: pointer; white-space: nowrap; border: 0.5px dashed var(--border-strong); border-radius: 4px; padding: 2px 6px; }
+  .tracking-add:hover { color: var(--accent); border-color: var(--accent); }
   .delivery-date { color: var(--text-muted); }
   .delivery-date.urgent { color: var(--warning); font-weight: 500; }
-  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+  .gmail-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: transparent; border: 0.5px solid var(--border-strong); color: var(--text-muted); text-decoration: none; font-size: 12px; transition: background 0.15s, color 0.15s; }
+  .gmail-btn:hover { background: var(--surface2); color: var(--text); }
   .last-updated { font-size: 11px; color: var(--text-hint); margin-top: 0.75rem; text-align: right; }
   .auth-screen { max-width: 480px; margin: 4rem auto; text-align: center; padding: 2rem; }
   .auth-icon { font-size: 48px; margin-bottom: 1rem; }
@@ -95,10 +112,11 @@
   .scanning-msg { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
   @media (max-width: 640px) {
     header { padding: 0 1rem; } main { padding: 1rem 1rem 3rem; } .page-title { font-size: 24px; }
-    colgroup col:nth-child(5), colgroup col:nth-child(6) { width: 0; }
-    thead th:nth-child(5), thead th:nth-child(6), tbody td:nth-child(5), tbody td:nth-child(6) { display: none; }
-    colgroup col:nth-child(1) { width: 35%; } colgroup col:nth-child(2) { width: 18%; }
-    colgroup col:nth-child(3) { width: 24%; } colgroup col:nth-child(4) { width: 23%; }
+    colgroup col:nth-child(5), colgroup col:nth-child(6), colgroup col:nth-child(7) { width: 0; }
+    thead th:nth-child(5), thead th:nth-child(6), thead th:nth-child(7),
+    tbody td:nth-child(5), tbody td:nth-child(6), tbody td:nth-child(7) { display: none; }
+    colgroup col:nth-child(1) { width: 36%; } colgroup col:nth-child(2) { width: 18%; }
+    colgroup col:nth-child(3) { width: 26%; } colgroup col:nth-child(4) { width: 20%; }
   }
 </style>
 </head>
@@ -118,9 +136,7 @@
     <h1 class="auth-title">Delivery tracker</h1>
     <p class="auth-desc">Connect your Gmail account to automatically scan for shipping and delivery emails. Your inbox is read-only and never stored.</p>
     <div class="auth-card">
-      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;" onclick="connectGmail()">
-        Connect Gmail →
-      </button>
+      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;" onclick="connectGmail()">Connect Gmail →</button>
       <p style="font-size:11px; color:var(--text-hint); margin-top:12px;">Read-only access · No emails stored · Disconnect anytime</p>
     </div>
   </div>
@@ -156,7 +172,7 @@
     </div>
     <div class="table-wrap">
       <table>
-        <colgroup><col><col><col><col><col><col></colgroup>
+        <colgroup><col><col><col><col><col><col><col></colgroup>
         <thead>
           <tr>
             <th onclick="sortBy('item')" id="th-item">Item <em class="sort-arrow" id="arr-item">↕</em></th>
@@ -165,6 +181,7 @@
             <th onclick="sortBy('deliverySort')" id="th-deliverySort">Expected <em class="sort-arrow" id="arr-deliverySort">↑</em></th>
             <th onclick="sortBy('tracking')" id="th-tracking">Tracking # <em class="sort-arrow" id="arr-tracking">↕</em></th>
             <th onclick="sortBy('carrier')" id="th-carrier">Carrier <em class="sort-arrow" id="arr-carrier">↕</em></th>
+            <th>Email</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -183,6 +200,7 @@
 
 <script>
 const STATUS_LABELS = { arriving: 'Arriving today', transit: 'In transit', pickup: 'Ready for pickup', delivered: 'Delivered', ordered: 'Ordered' };
+const STATUS_OPTIONS = ['arriving', 'transit', 'pickup', 'delivered', 'ordered'];
 let packages = [];
 let sortKey = 'deliverySort';
 let sortDir = 1;
@@ -193,11 +211,10 @@ function show(id) {
   });
 }
 
-function getToken() {
-  try { return JSON.parse(localStorage.getItem('gmail_token')); } catch { return null; }
-}
+function getToken() { try { return JSON.parse(localStorage.getItem('gmail_token')); } catch { return null; } }
 function setToken(t) { localStorage.setItem('gmail_token', JSON.stringify(t)); }
 function clearToken() { localStorage.removeItem('gmail_token'); localStorage.removeItem('packages_cache'); }
+function savePackages() { localStorage.setItem('packages_cache', JSON.stringify({ packages, scannedAt: new Date().toISOString() })); }
 
 async function connectGmail() {
   const res = await fetch('/.netlify/functions/auth-url');
@@ -211,7 +228,6 @@ async function scan(token) {
   const msgs = ['Searching for shipping emails…', 'Fetching delivery updates…', 'Extracting package details…', 'Almost done…'];
   let i = 0;
   const interval = setInterval(() => { document.getElementById('scanning-msg').textContent = msgs[Math.min(++i, msgs.length-1)]; }, 2500);
-
   try {
     const res = await fetch('/.netlify/functions/scan-packages', {
       method: 'POST',
@@ -232,6 +248,45 @@ async function scan(token) {
   }
 }
 
+function updateTracking(pkgId, value) {
+  packages = packages.map(p => p.id === pkgId ? { ...p, tracking: value || null } : p);
+  savePackages();
+  renderTable();
+}
+
+function editTracking(pkgId, currentVal) {
+  const cell = document.getElementById('track-cell-' + pkgId);
+  if (!cell) return;
+  const val = currentVal === '—' ? '' : currentVal;
+  cell.innerHTML = `<input class="tracking-input" id="track-input-${esc(pkgId)}" type="text" value="${esc(val)}" placeholder="Enter tracking #" maxlength="60">`;
+  const input = document.getElementById('track-input-' + pkgId);
+  input.focus();
+  input.select();
+  input.addEventListener('blur', () => { updateTracking(pkgId, input.value.trim()); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.blur();
+    if (e.key === 'Escape') { packages = packages.map(p => p); renderTable(); }
+  });
+}
+
+function getTrackingUrl(tracking, carrier) {
+  if (!tracking || tracking === '—') return null;
+  const t = String(tracking).replace(/\s/g, '');
+  const c = (carrier || '').toLowerCase();
+  if (c.includes('ups') || t.startsWith('1Z')) return `https://www.ups.com/track?tracknum=${t}`;
+  if (c.includes('fedex') || t.length === 12 || t.length === 15) return `https://www.fedex.com/fedextrack/?trknbr=${t}`;
+  if (c.includes('usps') || t.length >= 20) return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${t}`;
+  if (c.includes('dhl')) return `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${t}`;
+  if (c.includes('amazon')) return null;
+  return `https://www.google.com/search?q=${encodeURIComponent(tracking + ' tracking')}`;
+}
+
+function updateStatus(pkgId, newStatus) {
+  packages = packages.map(p => p.id === pkgId ? { ...p, status: newStatus } : p);
+  savePackages();
+  updateStats();
+}
+
 function renderTracker(scannedAt) {
   show('tracker-screen');
   document.getElementById('signout-btn').style.display = 'flex';
@@ -239,12 +294,16 @@ function renderTracker(scannedAt) {
   const ds = d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' at ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   document.getElementById('header-meta').textContent = 'Scanned ' + ds;
   document.getElementById('last-updated').textContent = 'Last scanned: ' + ds + ' · refreshes automatically on each visit';
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
   document.getElementById('count-arriving').textContent = packages.filter(p=>p.status==='arriving').length;
   document.getElementById('count-transit').textContent = packages.filter(p=>p.status==='transit').length;
   document.getElementById('count-pickup').textContent = packages.filter(p=>p.status==='pickup').length;
   document.getElementById('count-delivered').textContent = packages.filter(p=>p.status==='delivered').length;
   document.getElementById('total-count').textContent = packages.length;
-  renderTable();
 }
 
 function sortBy(key) {
@@ -270,23 +329,49 @@ function renderTable() {
     if (typeof bv==='string') bv=bv.toLowerCase();
     return av<bv?-sortDir:av>bv?sortDir:0;
   });
+
   const tbody = document.getElementById('tbody');
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No packages found</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:2rem;">No packages found</td></tr>`;
     return;
   }
+
   const urgent = ['Today','today','Ready now','Tomorrow','tomorrow'];
   tbody.innerHTML = data.map(p => {
     const isUrgent = urgent.some(t=>(p.delivery||'').includes(t));
     const tn = (!p.tracking||p.tracking==='null'||p.tracking===null)?'—':String(p.tracking);
     const tnShort = tn.length>20?tn.slice(0,18)+'…':tn;
+    const trackUrl = getTrackingUrl(tn, p.carrier);
+    const trackDisplay = tn === '—'
+      ? `<span class="tracking-add" onclick="editTracking('${esc(p.id)}', '${esc(tn)}')">+ Add</span>`
+      : trackUrl
+        ? `<a href="${esc(trackUrl)}" target="_blank" class="tracking-edit" title="${esc(tn)}">${esc(tnShort)}</a>`
+        : `<span class="tracking-edit" title="${esc(tn)}" onclick="editTracking('${esc(p.id)}', '${esc(tn)}')">${esc(tnShort)}</span>`;
+
+    const itemCell = p.gmailLink
+      ? `<a class="item-link" href="${esc(p.gmailLink)}" target="_blank" title="${esc(p.item)}">${esc(trunc(p.item,42))}</a>`
+      : `<span class="item-no-link" title="${esc(p.item)}">${esc(trunc(p.item,42))}</span>`;
+
+    const statusOptions = STATUS_OPTIONS.map(s =>
+      `<option value="${s}"${p.status===s?' selected':''}>${STATUS_LABELS[s]}</option>`
+    ).join('');
+
+    const gmailCell = p.gmailLink
+      ? `<a class="gmail-btn" href="${esc(p.gmailLink)}" target="_blank" title="Open email">✉</a>`
+      : `<span style="color:var(--text-hint); font-size:12px;">—</span>`;
+
     return `<tr>
-      <td class="item-name" title="${esc(p.item)}">${esc(trunc(p.item,44))}</td>
+      <td>${itemCell}</td>
       <td>${esc(p.retailer||'—')}</td>
-      <td><span class="badge ${p.status||'ordered'}"><span class="badge-dot"></span>${STATUS_LABELS[p.status]||p.status}</span></td>
+      <td>
+        <select class="status-select ${p.status||'ordered'}" onchange="updateStatus('${esc(p.id)}', this.value); this.className='status-select '+this.value;">
+          ${statusOptions}
+        </select>
+      </td>
       <td class="delivery-date${isUrgent?' urgent':''}">${esc(p.delivery||'TBD')}</td>
-      <td class="tracking-num" title="${esc(tn)}">${esc(tnShort)}</td>
+      <td><div class="tracking-cell" id="track-cell-${esc(p.id)}">${trackDisplay}</div></td>
       <td>${esc(p.carrier||'—')}</td>
+      <td>${gmailCell}</td>
     </tr>`;
   }).join('');
 }
