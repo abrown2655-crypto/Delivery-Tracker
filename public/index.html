@@ -1,1 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F6F2; --surface: #FFFFFF; --surface2: #F0EEE8;
+    --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.14);
+    --text: #1A1916; --text-muted: #6E6C66; --text-hint: #A09E98;
+    --accent: #2A5C45; --accent-bg: #E6F0EC; --accent-text: #1A3D2E;
+    --warning: #7A4F00; --warning-bg: #FFF3D6;
+    --info: #0D4D8A; --info-bg: #E3EFF9;
+    --success: #1A5C2A; --success-bg: #E3F4E8;
+    --neutral: #4A4845; --neutral-bg: #EDEBE5;
+    --danger: #7A1A1A; --danger-bg: #FDEAEA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16150F; --surface: #1E1D17; --surface2: #26251E;
+      --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+      --text: #F0EEE8; --text-muted: #9E9C96; --text-hint: #5C5A54;
+      --accent: #4A9E78; --accent-bg: #0F2E1E; --accent-text: #7EC4A0;
+      --warning: #F0B429; --warning-bg: #2A1E00;
+      --info: #5BA3E0; --info-bg: #071E38;
+      --success: #4CAF6E; --success-bg: #0A2414;
+      --neutral: #9E9C96; --neutral-bg: #26251E;
+      --danger: #E05555; --danger-bg: #2A0A0A;
+    }
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+  header { border-bottom: 1px solid var(--border); background: var(--surface); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 10; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--text); letter-spacing: -0.02em; }
+  .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+  .header-right { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-hint); }
+  main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .page-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; font-weight: 500; }
+  .stat-value { font-size: 26px; font-weight: 300; font-family: 'Fraunces', serif; letter-spacing: -0.03em; }
+  .stat-value.arriving { color: var(--warning); } .stat-value.transit { color: var(--info); }
+  .stat-value.pickup { color: var(--neutral); } .stat-value.delivered { color: var(--success); }
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .toolbar-left { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+  select, input[type="text"] { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 12px; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; transition: border-color 0.15s; }
+  select:focus, input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"] { min-width: 180px; cursor: text; }
+  .btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.15s; text-decoration: none; white-space: nowrap; }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .btn-primary:hover { opacity: 0.9; background: var(--accent); }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+  colgroup col:nth-child(1) { width: 28%; } colgroup col:nth-child(2) { width: 13%; }
+  colgroup col:nth-child(3) { width: 16%; } colgroup col:nth-child(4) { width: 13%; }
+  colgroup col:nth-child(5) { width: 20%; } colgroup col:nth-child(6) { width: 10%; }
+  thead th { background: var(--surface2); padding: 10px 14px; font-size: 11px; font-weight: 500; color: var(--text-muted); text-align: left; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+  thead th:hover { color: var(--text); }
+  thead th.sort-active { color: var(--text); }
+  .sort-arrow { margin-left: 4px; opacity: 0.4; font-style: normal; }
+  .sort-active .sort-arrow { opacity: 1; }
+  tbody tr { transition: background 0.1s; }
+  tbody tr:hover td { background: var(--surface2); }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  .item-name { font-weight: 500; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge.arriving { background: var(--warning-bg); color: var(--warning); } .badge.arriving .badge-dot { background: var(--warning); }
+  .badge.transit { background: var(--info-bg); color: var(--info); } .badge.transit .badge-dot { background: var(--info); }
+  .badge.pickup { background: var(--neutral-bg); color: var(--neutral); } .badge.pickup .badge-dot { background: var(--neutral); }
+  .badge.delivered { background: var(--success-bg); color: var(--success); } .badge.delivered .badge-dot { background: var(--success); }
+  .badge.ordered { background: var(--surface2); color: var(--text-muted); } .badge.ordered .badge-dot { background: var(--text-muted); }
+  .tracking-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .delivery-date { color: var(--text-muted); }
+  .delivery-date.urgent { color: var(--warning); font-weight: 500; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+  .last-updated { font-size: 11px; color: var(--text-hint); margin-top: 0.75rem; text-align: right; }
+  .auth-screen { max-width: 480px; margin: 4rem auto; text-align: center; padding: 2rem; }
+  .auth-icon { font-size: 48px; margin-bottom: 1rem; }
+  .auth-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 300; letter-spacing: -0.03em; margin-bottom: 8px; }
+  .auth-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6; }
+  .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+  .loading-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 1.5rem; }
+  .loading-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 30%; animation: scan 1.5s ease-in-out infinite; }
+  @keyframes scan { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+  .scanning-msg { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
+  @media (max-width: 640px) {
+    header { padding: 0 1rem; } main { padding: 1rem 1rem 3rem; } .page-title { font-size: 24px; }
+    colgroup col:nth-child(5), colgroup col:nth-child(6) { width: 0; }
+    thead th:nth-child(5), thead th:nth-child(6), tbody td:nth-child(5), tbody td:nth-child(6) { display: none; }
+    colgroup col:nth-child(1) { width: 35%; } colgroup col:nth-child(2) { width: 18%; }
+    colgroup col:nth-child(3) { width: 24%; } colgroup col:nth-child(4) { width: 23%; }
+  }
+</style>
+</head>
+<body>
 
+<header>
+  <div class="logo"><div class="logo-icon">📦</div>Deliveries</div>
+  <div class="header-right">
+    <span id="header-meta"></span>
+    <button class="btn" id="signout-btn" style="display:none" onclick="signOut()">Sign out</button>
+  </div>
+</header>
+
+<main id="main-content">
+  <div class="auth-screen" id="auth-screen">
+    <div class="auth-icon">📬</div>
+    <h1 class="auth-title">Delivery tracker</h1>
+    <p class="auth-desc">Connect your Gmail account to automatically scan for shipping and delivery emails. Your inbox is read-only and never stored.</p>
+    <div class="auth-card">
+      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;" onclick="connectGmail()">
+        Connect Gmail →
+      </button>
+      <p style="font-size:11px; color:var(--text-hint); margin-top:12px;">Read-only access · No emails stored · Disconnect anytime</p>
+    </div>
+  </div>
+
+  <div id="scanning-screen" style="display:none; max-width:480px; margin: 4rem auto; text-align:center; padding:2rem;">
+    <div style="font-family:'Fraunces',serif; font-size:24px; font-weight:300; margin-bottom:1rem;">Scanning your inbox…</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+    <div class="scanning-msg" id="scanning-msg">Searching for shipping emails</div>
+  </div>
+
+  <div id="tracker-screen" style="display:none;">
+    <h1 class="page-title">Your packages</h1>
+    <p class="page-subtitle">Tracking <span id="total-count">0</span> shipments · auto-scanned from Gmail</p>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Arriving today</div><div class="stat-value arriving" id="count-arriving">0</div></div>
+      <div class="stat-card"><div class="stat-label">In transit</div><div class="stat-value transit" id="count-transit">0</div></div>
+      <div class="stat-card"><div class="stat-label">Ready for pickup</div><div class="stat-value pickup" id="count-pickup">0</div></div>
+      <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-value delivered" id="count-delivered">0</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input type="text" id="search" placeholder="Search packages…" oninput="renderTable()">
+        <select id="filter-status" onchange="renderTable()">
+          <option value="">All statuses</option>
+          <option value="arriving">Arriving today</option>
+          <option value="transit">In transit</option>
+          <option value="pickup">Ready for pickup</option>
+          <option value="delivered">Delivered</option>
+          <option value="ordered">Ordered</option>
+        </select>
+      </div>
+      <button class="btn" onclick="rescan()">↺ Rescan inbox</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <colgroup><col><col><col><col><col><col></colgroup>
+        <thead>
+          <tr>
+            <th onclick="sortBy('item')" id="th-item">Item <em class="sort-arrow" id="arr-item">↕</em></th>
+            <th onclick="sortBy('retailer')" id="th-retailer">Retailer <em class="sort-arrow" id="arr-retailer">↕</em></th>
+            <th onclick="sortBy('status')" id="th-status">Status <em class="sort-arrow" id="arr-status">↕</em></th>
+            <th onclick="sortBy('deliverySort')" id="th-deliverySort">Expected <em class="sort-arrow" id="arr-deliverySort">↑</em></th>
+            <th onclick="sortBy('tracking')" id="th-tracking">Tracking # <em class="sort-arrow" id="arr-tracking">↕</em></th>
+            <th onclick="sortBy('carrier')" id="th-carrier">Carrier <em class="sort-arrow" id="arr-carrier">↕</em></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="last-updated" id="last-updated"></div>
+  </div>
+
+  <div id="error-screen" style="display:none; max-width:480px; margin:4rem auto; text-align:center; padding:2rem;">
+    <div style="font-size:36px; margin-bottom:1rem;">⚠️</div>
+    <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:300; margin-bottom:8px;">Something went wrong</div>
+    <div id="error-msg" style="font-size:13px; color:var(--text-muted); margin-bottom:1.5rem;"></div>
+    <button class="btn btn-primary" onclick="signOut()">Try again</button>
+  </div>
+</main>
+
+<script>
+const STATUS_LABELS = { arriving: 'Arriving today', transit: 'In transit', pickup: 'Ready for pickup', delivered: 'Delivered', ordered: 'Ordered' };
+let packages = [];
+let sortKey = 'deliverySort';
+let sortDir = 1;
+
+function show(id) {
+  ['auth-screen','scanning-screen','tracker-screen','error-screen'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
+  });
+}
+
+function getToken() {
+  try { return JSON.parse(localStorage.getItem('gmail_token')); } catch { return null; }
+}
+function setToken(t) { localStorage.setItem('gmail_token', JSON.stringify(t)); }
+function clearToken() { localStorage.removeItem('gmail_token'); localStorage.removeItem('packages_cache'); }
+
+async function connectGmail() {
+  const res = await fetch('/.netlify/functions/auth-url');
+  const { url } = await res.json();
+  window.location.href = url;
+}
+
+async function scan(token) {
+  show('scanning-screen');
+  document.getElementById('signout-btn').style.display = 'none';
+  const msgs = ['Searching for shipping emails…', 'Fetching delivery updates…', 'Extracting package details…', 'Almost done…'];
+  let i = 0;
+  const interval = setInterval(() => { document.getElementById('scanning-msg').textContent = msgs[Math.min(++i, msgs.length-1)]; }, 2500);
+
+  try {
+    const res = await fetch('/.netlify/functions/scan-packages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    clearInterval(interval);
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const data = await res.json();
+    if (data.tokens) setToken(data.tokens);
+    packages = data.packages || [];
+    localStorage.setItem('packages_cache', JSON.stringify({ packages, scannedAt: data.scannedAt }));
+    renderTracker(data.scannedAt);
+  } catch (err) {
+    clearInterval(interval);
+    document.getElementById('error-msg').textContent = err.message;
+    show('error-screen');
+  }
+}
+
+function renderTracker(scannedAt) {
+  show('tracker-screen');
+  document.getElementById('signout-btn').style.display = 'flex';
+  const d = new Date(scannedAt);
+  const ds = d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' at ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('header-meta').textContent = 'Scanned ' + ds;
+  document.getElementById('last-updated').textContent = 'Last scanned: ' + ds + ' · refreshes automatically on each visit';
+  document.getElementById('count-arriving').textContent = packages.filter(p=>p.status==='arriving').length;
+  document.getElementById('count-transit').textContent = packages.filter(p=>p.status==='transit').length;
+  document.getElementById('count-pickup').textContent = packages.filter(p=>p.status==='pickup').length;
+  document.getElementById('count-delivered').textContent = packages.filter(p=>p.status==='delivered').length;
+  document.getElementById('total-count').textContent = packages.length;
+  renderTable();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sort-active'));
+  document.getElementById('th-'+key)?.classList.add('sort-active');
+  document.querySelectorAll('.sort-arrow').forEach(a=>a.textContent='↕');
+  const arr = document.getElementById('arr-'+key);
+  if (arr) arr.textContent = sortDir===1?'↑':'↓';
+  renderTable();
+}
+
+function renderTable() {
+  const q = (document.getElementById('search')?.value||'').toLowerCase();
+  const fs = document.getElementById('filter-status')?.value||'';
+  let data = packages.filter(p => {
+    if (fs && p.status !== fs) return false;
+    if (q && !String(p.item||'').toLowerCase().includes(q) && !String(p.retailer||'').toLowerCase().includes(q) && !String(p.tracking||'').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b) => {
+    let av = a[sortKey]??'', bv = b[sortKey]??'';
+    if (typeof av==='string') av=av.toLowerCase();
+    if (typeof bv==='string') bv=bv.toLowerCase();
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+  const tbody = document.getElementById('tbody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No packages found</div></td></tr>`;
+    return;
+  }
+  const urgent = ['Today','today','Ready now','Tomorrow','tomorrow'];
+  tbody.innerHTML = data.map(p => {
+    const isUrgent = urgent.some(t=>(p.delivery||'').includes(t));
+    const tn = (!p.tracking||p.tracking==='null'||p.tracking===null)?'—':String(p.tracking);
+    const tnShort = tn.length>20?tn.slice(0,18)+'…':tn;
+    return `<tr>
+      <td class="item-name" title="${esc(p.item)}">${esc(trunc(p.item,44))}</td>
+      <td>${esc(p.retailer||'—')}</td>
+      <td><span class="badge ${p.status||'ordered'}"><span class="badge-dot"></span>${STATUS_LABELS[p.status]||p.status}</span></td>
+      <td class="delivery-date${isUrgent?' urgent':''}">${esc(p.delivery||'TBD')}</td>
+      <td class="tracking-num" title="${esc(tn)}">${esc(tnShort)}</td>
+      <td>${esc(p.carrier||'—')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function trunc(s,n) { s=String(s||''); return s.length>n?s.slice(0,n)+'…':s; }
+function signOut() { clearToken(); window.location.href = '/'; }
+function rescan() { const t = getToken(); if (t) scan(t); }
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  const urlError = params.get('error');
+
+  if (urlToken) {
+    const token = JSON.parse(decodeURIComponent(urlToken));
+    setToken(token);
+    window.history.replaceState({}, '', '/');
+    await scan(token);
+    return;
+  }
+
+  if (urlError) {
+    document.getElementById('error-msg').textContent = decodeURIComponent(urlError);
+    show('error-screen');
+    return;
+  }
+
+  const token = getToken();
+  if (!token) { show('auth-screen'); return; }
+
+  const cached = localStorage.getItem('packages_cache');
+  if (cached) {
+    const { packages: cp, scannedAt } = JSON.parse(cached);
+    const age = Date.now() - new Date(scannedAt).getTime();
+    if (age < 30 * 60 * 1000) {
+      packages = cp;
+      renderTracker(scannedAt);
+      if (age > 5 * 60 * 1000) scan(token);
+      return;
+    }
+  }
+
+  await scan(token);
+}
+
+document.getElementById('th-deliverySort').classList.add('sort-active');
+document.getElementById('arr-deliverySort').textContent = '↑';
+init();
+</script>
+</body>
+</html>
