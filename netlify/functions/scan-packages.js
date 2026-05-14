@@ -59,7 +59,7 @@ async function getGmailMessages(auth) {
     }
   }
 
-  const details = await Promise.all(
+  const messages = await Promise.all(
     allMessages.slice(0, 20).map((msg) =>
       gmail.users.messages
         .get({ userId: "me", id: msg.id, format: "full" })
@@ -67,38 +67,50 @@ async function getGmailMessages(auth) {
           const headers = r.data.payload.headers;
           const get = (name) => headers.find((h) => h.name === name)?.value || "";
           const body = extractBody(r.data.payload);
-          return `Subject: ${get("Subject")}\nFrom: ${get("From")}\nDate: ${get("Date")}\nSnippet: ${r.data.snippet}\nBody: ${body}`;
+          return {
+            id: msg.id,
+            text: `Subject: ${get("Subject")}\nFrom: ${get("From")}\nDate: ${get("Date")}\nSnippet: ${r.data.snippet}\nBody: ${body}`
+          };
         })
         .catch(() => null)
     )
   );
 
-  return details.filter(Boolean).join("\n\n---\n\n");
+  return messages.filter(Boolean);
 }
 
-async function extractPackages(emailData) {
+async function extractPackages(messages) {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const emailData = messages.map(m => m.text).join("\n\n---\n\n");
 
   const msg = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 1500,
+    max_tokens: 2000,
     system: `You extract shipment data from email content. Today is ${today}. Return ONLY a JSON array with these fields per shipment:
 - id: unique string (use order number or generate one)
+- messageIndex: the index (0-based) of the email in the list that best corresponds to this shipment
 - item: product name or order description (max 60 chars)
 - retailer: sender/store name
 - status: "arriving" (today/tomorrow), "transit" (shipped, not yet arriving), "pickup" (ready for pickup), "delivered", or "ordered" (not yet shipped)
 - delivery: human-readable date string like "May 14", "Today", "Tomorrow", "May 16-21", or "TBD"
 - deliverySort: number for sorting (0=today, 1=tomorrow, 2=this week, 3=later, 99=unknown)
-- tracking: tracking number string or null. Look carefully in the email body for tracking numbers - they are often long strings of numbers like 1Z999AA10123456784 (UPS), 9400111899223397719185 (USPS), or similar. Extract the full tracking number.
+- tracking: full tracking number string or null
 - carrier: UPS/FedEx/USPS/DHL/Amazon/etc or null
 - orderNumber: order/confirmation number or null
 
 Return [] if no shipments found. No markdown, no explanation.`,
-    messages: [{ role: "user", content: `Email data:\n\n${emailData}` }],
+    messages: [{ role: "user", content: `Email data (each email is separated by ---):\n\n${emailData}` }],
   });
 
   const text = msg.content[0].text.replace(/```json|```/g, "").trim();
-  return JSON.parse(text);
+  const packages = JSON.parse(text);
+
+  return packages.map(pkg => ({
+    ...pkg,
+    gmailLink: pkg.messageIndex !== undefined && messages[pkg.messageIndex]
+      ? `https://mail.google.com/mail/u/0/#inbox/${messages[pkg.messageIndex].id}`
+      : null
+  }));
 }
 
 exports.handler = async (event) => {
@@ -117,8 +129,8 @@ exports.handler = async (event) => {
     if (code) {
       const { tokens } = await oauth2Client.getToken(code);
       oauth2Client.setCredentials(tokens);
-      const emailData = await getGmailMessages(oauth2Client);
-      const packages = await extractPackages(emailData);
+      const messages = await getGmailMessages(oauth2Client);
+      const packages = await extractPackages(messages);
       return {
         statusCode: 200,
         headers,
@@ -128,8 +140,8 @@ exports.handler = async (event) => {
 
     if (token) {
       oauth2Client.setCredentials(typeof token === "string" ? JSON.parse(token) : token);
-      const emailData = await getGmailMessages(oauth2Client);
-      const packages = await extractPackages(emailData);
+      const messages = await getGmailMessages(oauth2Client);
+      const packages = await extractPackages(messages);
       return {
         statusCode: 200,
         headers,
