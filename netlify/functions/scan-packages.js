@@ -11,6 +11,30 @@ function getOAuthClient() {
   );
 }
 
+function decodeBase64(data) {
+  return Buffer.from(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8');
+}
+
+function extractBody(payload) {
+  let body = '';
+  if (payload.body && payload.body.data) {
+    body += decodeBase64(payload.body.data);
+  }
+  if (payload.parts) {
+    for (const part of payload.parts) {
+      if (part.mimeType === 'text/plain' && part.body && part.body.data) {
+        body += decodeBase64(part.body.data);
+      } else if (part.mimeType === 'text/html' && part.body && part.body.data) {
+        const html = decodeBase64(part.body.data);
+        body += html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+      } else if (part.parts) {
+        body += extractBody(part);
+      }
+    }
+  }
+  return body.slice(0, 3000);
+}
+
 async function getGmailMessages(auth) {
   const gmail = google.gmail({ version: "v1", auth });
   const queries = [
@@ -36,13 +60,14 @@ async function getGmailMessages(auth) {
   }
 
   const details = await Promise.all(
-    allMessages.slice(0, 25).map((msg) =>
+    allMessages.slice(0, 20).map((msg) =>
       gmail.users.messages
-        .get({ userId: "me", id: msg.id, format: "metadata", metadataHeaders: ["Subject", "From", "Date"] })
+        .get({ userId: "me", id: msg.id, format: "full" })
         .then((r) => {
           const headers = r.data.payload.headers;
           const get = (name) => headers.find((h) => h.name === name)?.value || "";
-          return `Subject: ${get("Subject")}\nFrom: ${get("From")}\nDate: ${get("Date")}\nSnippet: ${r.data.snippet}`;
+          const body = extractBody(r.data.payload);
+          return `Subject: ${get("Subject")}\nFrom: ${get("From")}\nDate: ${get("Date")}\nSnippet: ${r.data.snippet}\nBody: ${body}`;
         })
         .catch(() => null)
     )
@@ -57,14 +82,14 @@ async function extractPackages(emailData) {
   const msg = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 1500,
-    system: `You extract shipment data from email metadata. Today is ${today}. Return ONLY a JSON array with these fields per shipment:
+    system: `You extract shipment data from email content. Today is ${today}. Return ONLY a JSON array with these fields per shipment:
 - id: unique string (use order number or generate one)
 - item: product name or order description (max 60 chars)
 - retailer: sender/store name
 - status: "arriving" (today/tomorrow), "transit" (shipped, not yet arriving), "pickup" (ready for pickup), "delivered", or "ordered" (not yet shipped)
-- delivery: human-readable date string like "May 14", "Today", "Tomorrow", "May 16–21", or "TBD"
+- delivery: human-readable date string like "May 14", "Today", "Tomorrow", "May 16-21", or "TBD"
 - deliverySort: number for sorting (0=today, 1=tomorrow, 2=this week, 3=later, 99=unknown)
-- tracking: tracking number string or null
+- tracking: tracking number string or null. Look carefully in the email body for tracking numbers - they are often long strings of numbers like 1Z999AA10123456784 (UPS), 9400111899223397719185 (USPS), or similar. Extract the full tracking number.
 - carrier: UPS/FedEx/USPS/DHL/Amazon/etc or null
 - orderNumber: order/confirmation number or null
 
