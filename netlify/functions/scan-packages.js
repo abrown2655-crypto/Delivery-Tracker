@@ -55,7 +55,7 @@ async function extractPackages(emailData) {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 
   const msg = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1500,
     system: `You extract shipment data from email metadata. Today is ${today}. Return ONLY a JSON array with these fields per shipment:
 - id: unique string (use order number or generate one)
